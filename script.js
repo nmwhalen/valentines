@@ -23,6 +23,14 @@ function switchPage(fromPage, toPage) {
     pages[fromPage].classList.remove('active');
     setTimeout(() => {
         pages[toPage].classList.add('active');
+
+        // Regenerate sprinkles for the target page after layout settles
+        setTimeout(() => {
+            const container = pages[toPage].querySelector('.sprinkles-container');
+            if (container) {
+                generateSprinkles(container);
+            }
+        }, 100);
     }, 100);
 }
 
@@ -67,4 +75,85 @@ document.addEventListener('DOMContentLoaded', () => {
         stroke.style.strokeDasharray = length;
         stroke.style.strokeDashoffset = length;
     });
+
+    // Generate sprinkles for active page
+    const activePage = document.querySelector('.page.active');
+    const container = activePage.querySelector('.sprinkles-container');
+    if (container) {
+        generateSprinkles(container);
+    }
+});
+
+// ===== Dynamic Sprinkle Generation =====
+function generateSprinkles(container) {
+    // Get the parent page
+    const page = container.closest('.page');
+    if (!page) return;
+
+    // Temporarily hide container to measure content height
+    container.style.display = 'none';
+
+    // Measure content height
+    const contentHeight = page.scrollHeight;
+
+    // Calculate container dimensions
+    const containerWidth = page.offsetWidth;
+    const containerHeight = contentHeight;
+
+    // Set container height to match content
+    container.style.height = containerHeight + 'px';
+    container.style.display = '';
+
+    // Clear existing sprinkles
+    container.innerHTML = '';
+
+    // Calculate sprinkle count based on area (density ~14,000 px^2/sprinkle)
+    const area = containerWidth * containerHeight;
+    const density = 14000;
+    let sprinkleCount = Math.round(area / density);
+    sprinkleCount = Math.max(50, Math.min(400, sprinkleCount));
+
+    // Color palette cycling
+    const colors = ['var(--coral)', 'var(--pale-blue)', 'var(--sage-green)', 'var(--lavender)', 'var(--muted-gold)'];
+
+    // Create document fragment for performance
+    const fragment = document.createDocumentFragment();
+
+    // Generate sprinkles
+    for (let i = 0; i < sprinkleCount; i++) {
+        const sprinkle = document.createElement('div');
+        sprinkle.className = 'sprinkle';
+
+        // Random position (top 2-98%, left 2-94%)
+        const top = 2 + Math.random() * 96;
+        const left = 2 + Math.random() * 92;
+
+        // Random rotation (-60 to +70 deg)
+        const rotation = -60 + Math.random() * 130;
+
+        // Cycle through colors
+        const color = colors[i % colors.length];
+
+        sprinkle.style.background = color;
+        sprinkle.style.top = top + '%';
+        sprinkle.style.left = left + '%';
+        sprinkle.style.transform = `rotate(${rotation}deg)`;
+
+        fragment.appendChild(sprinkle);
+    }
+
+    // Append all sprinkles at once
+    container.appendChild(fragment);
+}
+
+// ===== Debounced Resize Handler =====
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        // Regenerate sprinkles for all pages with containers
+        document.querySelectorAll('.sprinkles-container').forEach(container => {
+            generateSprinkles(container);
+        });
+    }, 250);
 });
