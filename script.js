@@ -33,9 +33,19 @@ restartBtn.addEventListener('click', () => {
 
 // Page transition helper
 function switchPage(fromPage, toPage) {
+    // Pause physics when leaving landing page
+    if (fromPage === 'landing' && physicsState.initialized) {
+        pausePhysics();
+    }
+
     pages[fromPage].classList.remove('active');
     setTimeout(() => {
         pages[toPage].classList.add('active');
+
+        // Resume physics when returning to landing page
+        if (toPage === 'landing' && physicsState.initialized) {
+            resumePhysics();
+        }
 
         // Scroll to top of the page
         pages[toPage].scrollTop = 0;
@@ -73,32 +83,6 @@ function revealPhoto(card) {
     // 2. Shape overlay fading out (opacity transition)
 }
 
-// ===== Initialize Brush Strokes =====
-// Set initial stroke-dasharray and stroke-dashoffset for all brush strokes
-document.addEventListener('DOMContentLoaded', () => {
-    // Initialize photo gallery brush strokes
-    const brushStrokes = document.querySelectorAll('.brush-stroke');
-    brushStrokes.forEach(stroke => {
-        const length = stroke.getTotalLength();
-        stroke.style.strokeDasharray = length;
-        stroke.style.strokeDashoffset = length;
-    });
-
-    // Initialize title brush strokes
-    const titleBrushStrokes = document.querySelectorAll('.title-brush-stroke');
-    titleBrushStrokes.forEach(stroke => {
-        const length = stroke.getTotalLength();
-        stroke.style.strokeDasharray = length;
-        stroke.style.strokeDashoffset = length;
-    });
-
-    // Generate sprinkles for active page
-    const activePage = document.querySelector('.page.active');
-    const container = activePage.querySelector('.sprinkles-container');
-    if (container) {
-        generateSprinkles(container);
-    }
-});
 
 // ===== Dynamic Sprinkle Generation =====
 function generateSprinkles(container) {
@@ -176,5 +160,374 @@ window.addEventListener('resize', () => {
         document.querySelectorAll('.sprinkles-container').forEach(container => {
             generateSprinkles(container);
         });
+
+        // Update physics viewport bounds
+        if (physicsState.initialized) {
+            updateViewportBounds();
+        }
     }, 250);
+});
+
+// ===== Interactive Shape Physics =====
+const FRICTION = 0.985;
+const RESTITUTION = 0.6;
+const MAX_FLING_VELOCITY = 25;
+const IDLE_SPEED = 0.3;
+const AMBIENT_DRIFT_FORCE = 0.05;
+
+const physicsState = {
+    bodies: [],
+    viewportBounds: { width: 0, height: 0 },
+    animationId: null,
+    isPaused: false,
+    initialized: false
+};
+
+function updateViewportBounds() {
+    const landing = document.getElementById('landing');
+    physicsState.viewportBounds.width = landing.offsetWidth;
+    physicsState.viewportBounds.height = landing.offsetHeight;
+}
+
+function initShapePhysics() {
+    const landing = document.getElementById('landing');
+    const shapes = landing.querySelectorAll('.floating-shape');
+
+    if (shapes.length === 0 || physicsState.initialized) return;
+
+    // Store viewport bounds
+    updateViewportBounds();
+
+    // Convert each shape to a physics body
+    shapes.forEach((element, index) => {
+        const rect = element.getBoundingClientRect();
+        const landingRect = landing.getBoundingClientRect();
+
+        // Calculate center position relative to landing page
+        const width = rect.width;
+        const height = rect.height;
+        const radius = width / 2;
+
+        // Get current position relative to landing page
+        const x = rect.left - landingRect.left + radius;
+        const y = rect.top - landingRect.top + radius;
+
+        // Add physics-active class (removes CSS positioning, sets top:0 left:0)
+        element.classList.add('physics-active');
+
+        // Apply initial transform to maintain visual position
+        element.style.transform = `translate(${x - radius}px, ${y - radius}px)`;
+
+        // Create physics body
+        const body = {
+            element: element,
+            x: x,
+            y: y,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: (Math.random() - 0.5) * 0.5,
+            radius: radius,
+            mass: radius * radius,
+            isDragging: false,
+            dragOffsetX: 0,
+            dragOffsetY: 0,
+            pointerHistory: [],
+            pointerId: null
+        };
+
+        physicsState.bodies.push(body);
+
+        // Attach pointer event handlers
+        attachPointerHandlers(body);
+    });
+
+    // Run silent physics frames to resolve initial overlaps
+    for (let i = 0; i < 20; i++) {
+        resolveCollisions();
+    }
+
+    // Apply final positions after initial collision resolution
+    physicsState.bodies.forEach(body => {
+        body.element.style.transform = `translate(${body.x - body.radius}px, ${body.y - body.radius}px)`;
+    });
+
+    physicsState.initialized = true;
+
+    // Start physics loop
+    startPhysicsLoop();
+}
+
+function attachPointerHandlers(body) {
+    const element = body.element;
+
+    element.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+
+        // Capture this pointer
+        element.setPointerCapture(e.pointerId);
+
+        body.isDragging = true;
+        body.pointerId = e.pointerId;
+        body.vx = 0;
+        body.vy = 0;
+        body.pointerHistory = [];
+
+        // Calculate drag offset
+        const rect = element.getBoundingClientRect();
+        const landing = document.getElementById('landing');
+        const landingRect = landing.getBoundingClientRect();
+
+        body.dragOffsetX = (e.clientX - landingRect.left) - body.x;
+        body.dragOffsetY = (e.clientY - landingRect.top) - body.y;
+
+        element.classList.add('dragging');
+    });
+
+    element.addEventListener('pointermove', (e) => {
+        if (!body.isDragging || e.pointerId !== body.pointerId) return;
+
+        e.preventDefault();
+
+        const landing = document.getElementById('landing');
+        const landingRect = landing.getBoundingClientRect();
+
+        // Update position
+        body.x = (e.clientX - landingRect.left) - body.dragOffsetX;
+        body.y = (e.clientY - landingRect.top) - body.dragOffsetY;
+
+        // Record position history for velocity calculation
+        body.pointerHistory.push({
+            x: body.x,
+            y: body.y,
+            time: performance.now()
+        });
+
+        // Keep only last 5 entries
+        if (body.pointerHistory.length > 5) {
+            body.pointerHistory.shift();
+        }
+    });
+
+    const endDrag = (e) => {
+        if (!body.isDragging || e.pointerId !== body.pointerId) return;
+
+        body.isDragging = false;
+        body.pointerId = null;
+        element.classList.remove('dragging');
+
+        // Calculate fling velocity from pointer history
+        if (body.pointerHistory.length >= 2) {
+            const now = performance.now();
+            const lookbackTime = 80; // ms
+
+            // Find oldest point within lookback window
+            let oldestIndex = body.pointerHistory.length - 1;
+            for (let i = body.pointerHistory.length - 1; i >= 0; i--) {
+                if (now - body.pointerHistory[i].time <= lookbackTime) {
+                    oldestIndex = i;
+                } else {
+                    break;
+                }
+            }
+
+            if (oldestIndex < body.pointerHistory.length - 1) {
+                const oldest = body.pointerHistory[oldestIndex];
+                const newest = body.pointerHistory[body.pointerHistory.length - 1];
+                const dt = (newest.time - oldest.time) / 16.67; // normalize to 60fps frames
+
+                if (dt > 0) {
+                    body.vx = (newest.x - oldest.x) / dt;
+                    body.vy = (newest.y - oldest.y) / dt;
+
+                    // Cap velocity
+                    const speed = Math.sqrt(body.vx * body.vx + body.vy * body.vy);
+                    if (speed > MAX_FLING_VELOCITY) {
+                        const scale = MAX_FLING_VELOCITY / speed;
+                        body.vx *= scale;
+                        body.vy *= scale;
+                    }
+                }
+            }
+        }
+
+        body.pointerHistory = [];
+
+        if (element.hasPointerCapture(e.pointerId)) {
+            element.releasePointerCapture(e.pointerId);
+        }
+    };
+
+    element.addEventListener('pointerup', endDrag);
+    element.addEventListener('pointercancel', endDrag);
+}
+
+function startPhysicsLoop() {
+    let lastTime = performance.now();
+
+    function physicsLoop(currentTime) {
+        if (physicsState.isPaused) {
+            physicsState.animationId = requestAnimationFrame(physicsLoop);
+            return;
+        }
+
+        const dt = Math.min((currentTime - lastTime) / 16.67, 2); // cap at 2x normal speed
+        lastTime = currentTime;
+
+        // Update non-dragged bodies
+        physicsState.bodies.forEach(body => {
+            if (body.isDragging) return;
+
+            // Apply friction
+            body.vx *= FRICTION;
+            body.vy *= FRICTION;
+
+            // Ambient drift for slow-moving bodies
+            const speed = Math.sqrt(body.vx * body.vx + body.vy * body.vy);
+            if (speed < IDLE_SPEED) {
+                body.vx += (Math.random() - 0.5) * AMBIENT_DRIFT_FORCE;
+                body.vy += (Math.random() - 0.5) * AMBIENT_DRIFT_FORCE;
+            }
+
+            // Update position
+            body.x += body.vx * dt;
+            body.y += body.vy * dt;
+
+            // Wall collisions
+            handleWallCollisions(body);
+        });
+
+        // Resolve shape-shape collisions
+        resolveCollisions();
+
+        // Apply transforms
+        physicsState.bodies.forEach(body => {
+            body.element.style.transform = `translate(${body.x - body.radius}px, ${body.y - body.radius}px)`;
+        });
+
+        physicsState.animationId = requestAnimationFrame(physicsLoop);
+    }
+
+    physicsState.animationId = requestAnimationFrame(physicsLoop);
+}
+
+function handleWallCollisions(body) {
+    const bounds = physicsState.viewportBounds;
+
+    // Left wall
+    if (body.x - body.radius < 0) {
+        body.x = body.radius;
+        body.vx = Math.abs(body.vx) * RESTITUTION;
+    }
+
+    // Right wall
+    if (body.x + body.radius > bounds.width) {
+        body.x = bounds.width - body.radius;
+        body.vx = -Math.abs(body.vx) * RESTITUTION;
+    }
+
+    // Top wall
+    if (body.y - body.radius < 0) {
+        body.y = body.radius;
+        body.vy = Math.abs(body.vy) * RESTITUTION;
+    }
+
+    // Bottom wall
+    if (body.y + body.radius > bounds.height) {
+        body.y = bounds.height - body.radius;
+        body.vy = -Math.abs(body.vy) * RESTITUTION;
+    }
+}
+
+function resolveCollisions() {
+    const bodies = physicsState.bodies;
+
+    // Check all pairs
+    for (let i = 0; i < bodies.length; i++) {
+        for (let j = i + 1; j < bodies.length; j++) {
+            const a = bodies[i];
+            const b = bodies[j];
+
+            // Skip if either is being dragged
+            if (a.isDragging || b.isDragging) continue;
+
+            // Calculate distance
+            const dx = b.x - a.x;
+            const dy = b.y - a.y;
+            const distSq = dx * dx + dy * dy;
+            const minDist = a.radius + b.radius;
+            const minDistSq = minDist * minDist;
+
+            // Check collision
+            if (distSq < minDistSq && distSq > 0) {
+                const dist = Math.sqrt(distSq);
+                const overlap = minDist - dist;
+
+                // Normalize collision vector
+                const nx = dx / dist;
+                const ny = dy / dist;
+
+                // Separate bodies (proportional to mass)
+                const totalMass = a.mass + b.mass;
+                const separationA = overlap * (b.mass / totalMass);
+                const separationB = overlap * (a.mass / totalMass);
+
+                a.x -= nx * separationA;
+                a.y -= ny * separationA;
+                b.x += nx * separationB;
+                b.y += ny * separationB;
+
+                // Calculate relative velocity
+                const dvx = b.vx - a.vx;
+                const dvy = b.vy - a.vy;
+                const dotProduct = dvx * nx + dvy * ny;
+
+                // Only resolve if bodies are moving toward each other
+                if (dotProduct < 0) {
+                    // Elastic collision impulse
+                    const impulse = (2 * dotProduct) / totalMass;
+
+                    a.vx += impulse * b.mass * nx * RESTITUTION;
+                    a.vy += impulse * b.mass * ny * RESTITUTION;
+                    b.vx -= impulse * a.mass * nx * RESTITUTION;
+                    b.vy -= impulse * a.mass * ny * RESTITUTION;
+                }
+            }
+        }
+    }
+}
+
+function pausePhysics() {
+    physicsState.isPaused = true;
+}
+
+function resumePhysics() {
+    physicsState.isPaused = false;
+}
+
+// Initialize physics when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize photo gallery brush strokes
+    const brushStrokes = document.querySelectorAll('.brush-stroke');
+    brushStrokes.forEach(stroke => {
+        const length = stroke.getTotalLength();
+        stroke.style.strokeDasharray = length;
+        stroke.style.strokeDashoffset = length;
+    });
+
+    // Initialize title brush strokes
+    const titleBrushStrokes = document.querySelectorAll('.title-brush-stroke');
+    titleBrushStrokes.forEach(stroke => {
+        const length = stroke.getTotalLength();
+        stroke.style.strokeDasharray = length;
+        stroke.style.strokeDashoffset = length;
+    });
+
+    // Generate sprinkles for active page
+    const activePage = document.querySelector('.page.active');
+    const container = activePage.querySelector('.sprinkles-container');
+    if (container) {
+        generateSprinkles(container);
+    }
+
+    // Initialize shape physics
+    initShapePhysics();
 });
