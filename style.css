@@ -383,9 +383,9 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
+    width: 8px;
+    height: 4px;
+    border-radius: 1px;
     pointer-events: none;
     z-index: 4;
     animation: particleFall 0.8s ease-in forwards;
@@ -394,11 +394,11 @@ body {
 @keyframes particleFall {
     0% {
         opacity: 0.9;
-        transform: translate(var(--px), var(--py)) scale(1);
+        transform: translate(var(--px), var(--py)) scale(1) rotate(var(--rot-start, 0deg));
     }
     100% {
         opacity: 0;
-        transform: translate(var(--px-end), var(--py-end)) scale(0.3);
+        transform: translate(var(--px-end), var(--py-end)) scale(0.3) rotate(var(--rot-end, 180deg));
     }
 }
 
@@ -460,8 +460,9 @@ body {
 }
 
 .shape-overlay svg {
-    width: 80%;
-    height: 80%;
+    width: 70%;
+    height: auto;
+    max-height: 80%;
 }
 
 .tap-hint {
