@@ -177,6 +177,7 @@ const AMBIENT_DRIFT_FORCE = 0.05;
 const HOVER_ANGULAR_VELOCITY = 12;    // degrees per frame (randomized +/-)
 const HOVER_PARTICLE_COUNT = 12;       // particles per hover burst
 const HOVER_PARTICLE_DURATION = 800;   // ms, matches CSS animation
+const HOVER_COOLDOWN = 2500;           // ms, minimum time between hover effects
 
 const physicsState = {
     bodies: [],
@@ -237,7 +238,8 @@ function initShapePhysics() {
             pointerId: null,
             rotation: 0,
             angularVelocity: 0,
-            isHovered: false
+            isHovered: false,
+            lastHoverTime: 0
         };
 
         physicsState.bodies.push(body);
@@ -373,7 +375,12 @@ function attachPointerHandlers(body) {
         // Skip if already hovered or being dragged
         if (body.isHovered || body.isDragging) return;
 
+        // Check cooldown - prevent effect from triggering too frequently
+        const now = performance.now();
+        if (now - body.lastHoverTime < HOVER_COOLDOWN) return;
+
         body.isHovered = true;
+        body.lastHoverTime = now;
 
         // Apply random angular velocity for wiggle effect
         const direction = Math.random() < 0.5 ? 1 : -1;
@@ -404,10 +411,10 @@ function spawnHoverParticles(body) {
         const color = colors[Math.floor(Math.random() * colors.length)];
         particle.style.backgroundColor = color;
 
-        // Random start position near shape center with small spread
-        const spreadRadius = body.radius * 0.4;
-        const startOffsetX = (Math.random() - 0.5) * spreadRadius;
-        const startOffsetY = (Math.random() - 0.5) * spreadRadius;
+        // Random position along the border/perimeter of the shape
+        const angle = Math.random() * Math.PI * 2; // Random angle in radians
+        const startOffsetX = Math.cos(angle) * body.radius;
+        const startOffsetY = Math.sin(angle) * body.radius;
         const startX = body.x + startOffsetX;
         const startY = body.y + startOffsetY;
 
