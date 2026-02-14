@@ -97,6 +97,11 @@ restartBtn.addEventListener('click', (e) => {
     const galleryCards = document.querySelectorAll('.gallery-card');
     galleryCards.forEach(card => {
         card.classList.remove('revealed');
+        // Remove the full reveal rectangle from the mask
+        const fullRevealRect = card.querySelector('.full-reveal-rect');
+        if (fullRevealRect) {
+            fullRevealRect.remove();
+        }
     });
 
     // Remove old floating shapes and reset physics
@@ -174,9 +179,24 @@ function revealPhoto(card) {
     // Mark as revealed
     card.classList.add('revealed');
 
-    // The CSS animations will handle:
-    // 1. Brush strokes drawing (stroke-dashoffset animation)
-    // 2. Shape overlay fading out (opacity transition)
+    // After brush-stroke animations finish, reveal the full photo
+    setTimeout(() => {
+        const mask = card.querySelector('mask');
+        if (mask) {
+            const fullReveal = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            fullReveal.setAttribute('width', '400');
+            fullReveal.setAttribute('height', '400');
+            fullReveal.setAttribute('fill', 'white');
+            fullReveal.setAttribute('class', 'full-reveal-rect');
+            fullReveal.style.opacity = '0';
+            mask.appendChild(fullReveal);
+            // Trigger reflow then animate opacity
+            requestAnimationFrame(() => {
+                fullReveal.style.transition = 'opacity 0.5s ease';
+                fullReveal.style.opacity = '1';
+            });
+        }
+    }, 1100);
 }
 
 

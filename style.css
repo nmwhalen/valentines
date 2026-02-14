@@ -159,6 +159,12 @@ body {
     margin-top: 1rem;
     color: var(--text-dark);
     line-height: 1.4;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.gallery-card.revealed .caption {
+    opacity: 1;
 }
 
 .closing-title {
