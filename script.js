@@ -7,6 +7,7 @@ const pages = {
 
 const beginBtn = document.getElementById('begin-btn');
 const continueBtn = document.getElementById('continue-btn');
+const restartBtn = document.getElementById('restart-btn');
 
 // Navigate to gallery
 beginBtn.addEventListener('click', () => {
@@ -18,11 +19,26 @@ continueBtn.addEventListener('click', () => {
     switchPage('gallery', 'closing');
 });
 
+// Navigate back to landing and reset gallery
+restartBtn.addEventListener('click', () => {
+    // Reset all gallery cards to hidden state
+    const galleryCards = document.querySelectorAll('.gallery-card');
+    galleryCards.forEach(card => {
+        card.classList.remove('revealed');
+    });
+
+    // Navigate back to landing page
+    switchPage('closing', 'landing');
+});
+
 // Page transition helper
 function switchPage(fromPage, toPage) {
     pages[fromPage].classList.remove('active');
     setTimeout(() => {
         pages[toPage].classList.add('active');
+
+        // Scroll to top of the page
+        pages[toPage].scrollTop = 0;
 
         // Regenerate sprinkles for the target page after layout settles
         setTimeout(() => {

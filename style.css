@@ -185,6 +185,34 @@ body {
     margin-top: 1rem;
 }
 
+#restart-btn {
+    background: linear-gradient(135deg, var(--lavender) 0%, var(--pale-blue) 100%);
+    border: none;
+    color: white;
+    font-family: 'Caveat', cursive;
+    font-size: clamp(0.9rem, 3vw, 1.1rem);
+    font-weight: 400;
+    padding: 0.7rem 1.8rem;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    margin-top: 2rem;
+    opacity: 0.85;
+}
+
+#restart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    opacity: 1;
+}
+
+#restart-btn:active {
+    transform: translateY(-1px);
+}
+
 .blob-button:hover {
     transform: translateY(-3px);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
