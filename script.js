@@ -9,18 +9,28 @@ const beginBtn = document.getElementById('begin-btn');
 const continueBtn = document.getElementById('continue-btn');
 const restartBtn = document.getElementById('restart-btn');
 
+// Flag to block sprinkle regeneration during page transitions
+let isTransitioning = false;
+
 // Navigate to gallery
-beginBtn.addEventListener('click', () => {
+beginBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     switchPage('landing', 'gallery');
 });
 
 // Navigate to closing
-continueBtn.addEventListener('click', () => {
+continueBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     switchPage('gallery', 'closing');
 });
 
 // Navigate back to landing and reset gallery
-restartBtn.addEventListener('click', () => {
+restartBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     // Reset all gallery cards to hidden state
     const galleryCards = document.querySelectorAll('.gallery-card');
     galleryCards.forEach(card => {
@@ -33,6 +43,9 @@ restartBtn.addEventListener('click', () => {
 
 // Page transition helper
 function switchPage(fromPage, toPage) {
+    // Set transition flag to block resize-triggered regeneration
+    isTransitioning = true;
+
     // Pause physics when leaving landing page
     if (fromPage === 'landing' && physicsState.initialized) {
         pausePhysics();
@@ -56,6 +69,8 @@ function switchPage(fromPage, toPage) {
             if (container) {
                 generateSprinkles(container);
             }
+            // Clear transition flag after sprinkles are generated
+            isTransitioning = false;
         }, 100);
     }, 100);
 }
@@ -90,19 +105,22 @@ function generateSprinkles(container) {
     const page = container.closest('.page');
     if (!page) return;
 
-    // Temporarily hide container to measure content height
-    container.style.display = 'none';
-
-    // Measure content height
-    const contentHeight = page.scrollHeight;
-
-    // Calculate container dimensions
+    // Measure using .content sibling to avoid circular reference
+    // (the absolutely-positioned sprinkles container contributes to scrollHeight)
+    const contentEl = page.querySelector('.content');
     const containerWidth = page.offsetWidth;
-    const containerHeight = contentHeight;
+    const containerHeight = Math.max(page.clientHeight, contentEl ? contentEl.offsetHeight : page.clientHeight);
 
-    // Set container height to match content
+    // Skip if dimensions unchanged and sprinkles already exist
+    if (container.children.length > 0 &&
+        parseInt(container.dataset.w) === containerWidth &&
+        parseInt(container.dataset.h) === containerHeight) {
+        return;
+    }
+
+    container.dataset.w = containerWidth;
+    container.dataset.h = containerHeight;
     container.style.height = containerHeight + 'px';
-    container.style.display = '';
 
     // Clear existing sprinkles
     container.innerHTML = '';
@@ -156,10 +174,17 @@ let resizeTimeout;
 window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-        // Regenerate sprinkles for all pages with containers
-        document.querySelectorAll('.sprinkles-container').forEach(container => {
-            generateSprinkles(container);
-        });
+        // Skip if currently transitioning between pages
+        if (isTransitioning) return;
+
+        // Regenerate sprinkles for active page only (but skip landing page)
+        const activePage = document.querySelector('.page.active');
+        if (activePage && activePage.id !== 'landing') {
+            const container = activePage.querySelector('.sprinkles-container');
+            if (container) {
+                generateSprinkles(container);
+            }
+        }
 
         // Update physics viewport bounds
         if (physicsState.initialized) {

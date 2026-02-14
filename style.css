@@ -53,11 +53,19 @@ body {
     max-width: 1200px;
     width: 100%;
     text-align: center;
-    pointer-events: none; /* Allow clicking through to shapes */
+}
+
+/* Landing page: allow clicking through content to shapes */
+#landing .content {
+    pointer-events: none;
 }
 
 /* Center content for pages without overflow */
-#landing .content,
+#landing .content {
+    margin-top: auto;
+    margin-bottom: 0;
+}
+
 #closing .content {
     margin-top: auto;
     margin-bottom: auto;
@@ -65,6 +73,8 @@ body {
 
 #landing {
     overflow: hidden;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* ===== Typography ===== */
@@ -188,9 +198,8 @@ body {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
     margin-top: 1rem;
-    pointer-events: auto; /* Re-enable clicks on buttons */
     position: relative;
-    z-index: 20;
+    z-index: 150; /* Above dragging shapes (z-index: 100) and all other elements */
 }
 
 #restart-btn {
@@ -234,6 +243,7 @@ body {
 #landing #begin-btn {
     opacity: 0;
     animation: fadeInButton 0.8s ease-out 2.8s forwards;
+    margin-bottom: auto;
 }
 
 @keyframes fadeInButton {
