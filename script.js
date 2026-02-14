@@ -174,6 +174,9 @@ const RESTITUTION = 0.6;
 const MAX_FLING_VELOCITY = 25;
 const IDLE_SPEED = 0.3;
 const AMBIENT_DRIFT_FORCE = 0.05;
+const HOVER_ANGULAR_VELOCITY = 12;    // degrees per frame (randomized +/-)
+const HOVER_PARTICLE_COUNT = 12;       // particles per hover burst
+const HOVER_PARTICLE_DURATION = 800;   // ms, matches CSS animation
 
 const physicsState = {
     bodies: [],
@@ -231,7 +234,10 @@ function initShapePhysics() {
             dragOffsetX: 0,
             dragOffsetY: 0,
             pointerHistory: [],
-            pointerId: null
+            pointerId: null,
+            rotation: 0,
+            angularVelocity: 0,
+            isHovered: false
         };
 
         physicsState.bodies.push(body);
@@ -358,6 +364,72 @@ function attachPointerHandlers(body) {
 
     element.addEventListener('pointerup', endDrag);
     element.addEventListener('pointercancel', endDrag);
+
+    // Hover effects (desktop only)
+    element.addEventListener('pointerenter', (e) => {
+        // Only trigger on mouse hover, not touch
+        if (e.pointerType !== 'mouse') return;
+
+        // Skip if already hovered or being dragged
+        if (body.isHovered || body.isDragging) return;
+
+        body.isHovered = true;
+
+        // Apply random angular velocity for wiggle effect
+        const direction = Math.random() < 0.5 ? 1 : -1;
+        const velocity = (8 + Math.random() * 7) * direction; // 8-15 deg/frame
+        body.angularVelocity = velocity;
+
+        // Spawn particle burst
+        spawnHoverParticles(body);
+    });
+
+    element.addEventListener('pointerleave', (e) => {
+        body.isHovered = false;
+    });
+}
+
+function spawnHoverParticles(body) {
+    const landing = document.getElementById('landing');
+    const colors = ['var(--coral)', 'var(--pale-blue)', 'var(--sage-green)', 'var(--lavender)', 'var(--muted-gold)'];
+
+    // Spawn 10-14 particles
+    const particleCount = 10 + Math.floor(Math.random() * 5);
+
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'hover-particle';
+
+        // Random color from palette
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.backgroundColor = color;
+
+        // Random start position near shape center with small spread
+        const spreadRadius = body.radius * 0.4;
+        const startOffsetX = (Math.random() - 0.5) * spreadRadius;
+        const startOffsetY = (Math.random() - 0.5) * spreadRadius;
+        const startX = body.x + startOffsetX;
+        const startY = body.y + startOffsetY;
+
+        // Random end position: drift outward + fall downward
+        const driftX = (Math.random() - 0.5) * 30;
+        const fallY = 40 + Math.random() * 40; // 40-80px downward
+        const endX = startX + driftX;
+        const endY = startY + fallY;
+
+        // Set CSS custom properties for animation
+        particle.style.setProperty('--px', `${startX}px`);
+        particle.style.setProperty('--py', `${startY}px`);
+        particle.style.setProperty('--px-end', `${endX}px`);
+        particle.style.setProperty('--py-end', `${endY}px`);
+
+        // Remove particle after animation completes
+        particle.addEventListener('animationend', () => {
+            particle.remove();
+        });
+
+        landing.appendChild(particle);
+    }
 }
 
 function startPhysicsLoop() {
@@ -380,6 +452,10 @@ function startPhysicsLoop() {
             body.vx *= FRICTION;
             body.vy *= FRICTION;
 
+            // Update rotation
+            body.rotation += body.angularVelocity * dt;
+            body.angularVelocity *= 0.95; // angular friction (decays faster than linear)
+
             // Ambient drift for slow-moving bodies
             const speed = Math.sqrt(body.vx * body.vx + body.vy * body.vy);
             if (speed < IDLE_SPEED) {
@@ -400,7 +476,9 @@ function startPhysicsLoop() {
 
         // Apply transforms
         physicsState.bodies.forEach(body => {
-            body.element.style.transform = `translate(${body.x - body.radius}px, ${body.y - body.radius}px)`;
+            const x = body.x - body.radius;
+            const y = body.y - body.radius;
+            body.element.style.transform = `translate(${x}px, ${y}px) rotate(${body.rotation}deg)`;
         });
 
         physicsState.animationId = requestAnimationFrame(physicsLoop);
