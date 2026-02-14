@@ -53,6 +53,7 @@ body {
     max-width: 1200px;
     width: 100%;
     text-align: center;
+    pointer-events: none; /* Allow clicking through to shapes */
 }
 
 /* Center content for pages without overflow */
@@ -183,6 +184,9 @@ body {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
     margin-top: 1rem;
+    pointer-events: auto; /* Re-enable clicks on buttons */
+    position: relative;
+    z-index: 20;
 }
 
 #restart-btn {
@@ -351,6 +355,7 @@ body {
     user-select: none;
     -webkit-user-select: none;
     touch-action: none;
+    z-index: 5; /* Above title, below buttons */
 }
 
 .floating-shape.physics-active.dragging {
