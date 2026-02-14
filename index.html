@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Valentine's Day, Leah</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Landing Page -->
+    <section id="landing" class="page active">
+        <div class="content">
+            <div class="title-container">
+                <svg class="title-svg" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet">
+                    <defs>
+                        <mask id="title-mask">
+                            <rect width="800" height="300" fill="black"/>
+                            <!-- Brush strokes for "Happy Valentine's Day," -->
+                            <path class="title-brush-stroke stroke-1" d="M50,70 Q200,50 350,70 Q500,60 650,75 T750,85" stroke="white" stroke-width="55" fill="none" stroke-linecap="round"/>
+                            <path class="title-brush-stroke stroke-2" d="M60,130 Q210,115 360,130 Q510,120 660,135 T760,145" stroke="white" stroke-width="50" fill="none" stroke-linecap="round"/>
+                            <!-- Brush strokes for "Leah" -->
+                            <path class="title-brush-stroke stroke-3" d="M250,210 Q400,195 550,210" stroke="white" stroke-width="60" fill="none" stroke-linecap="round"/>
+                            <path class="title-brush-stroke stroke-4" d="M270,260 Q400,250 530,260" stroke="white" stroke-width="55" fill="none" stroke-linecap="round"/>
+                        </mask>
+                    </defs>
+                    <text x="400" y="90" text-anchor="middle" class="title-text line-1" mask="url(#title-mask)">Happy Valentine's Day,</text>
+                    <text x="400" y="240" text-anchor="middle" class="title-text line-2" mask="url(#title-mask)">Leah</text>
+                </svg>
+            </div>
+            <button id="begin-btn" class="blob-button">Begin</button>
+        </div>
+
+        <!-- Floating Decorative Shapes -->
+        <svg class="floating-shape shape-1" viewBox="0 0 200 200">
+            <path d="M100,20 Q150,40 160,90 Q150,140 100,160 Q50,140 40,90 Q50,40 100,20 Z" fill="#E8B4A0" opacity="0.6"/>
+        </svg>
+
+        <svg class="floating-shape shape-2" viewBox="0 0 180 220">
+            <path d="M90,10 Q140,30 150,80 Q160,130 140,170 Q100,210 60,180 Q20,140 30,90 Q40,40 90,10 Z" fill="#A8C5D1" opacity="0.6"/>
+        </svg>
+
+        <svg class="floating-shape shape-3" viewBox="0 0 160 180">
+            <path d="M80,20 C120,20 140,50 140,90 C140,130 110,160 80,160 C50,160 20,130 20,90 C20,50 40,20 80,20 Z" fill="#D4AF88" opacity="0.6"/>
+        </svg>
+
+        <svg class="floating-shape shape-4" viewBox="0 0 190 200">
+            <path d="M95,10 Q130,20 150,50 Q170,80 160,120 Q145,160 105,180 Q65,170 40,140 Q15,100 30,60 Q50,20 95,10 Z" fill="#9DB89A" opacity="0.6"/>
+        </svg>
+
+        <svg class="floating-shape shape-5" viewBox="0 0 170 190">
+            <path d="M85,15 C115,15 145,35 155,65 Q165,95 150,125 Q135,155 100,175 Q65,165 45,135 Q25,105 35,75 Q45,35 85,15 Z" fill="#C9B3D4" opacity="0.6"/>
+        </svg>
+
+        <svg class="floating-shape shape-6" viewBox="0 0 200 180">
+            <path d="M100,15 Q140,25 165,55 Q185,85 175,120 Q160,150 120,165 Q80,160 50,135 Q20,105 25,70 Q35,35 100,15 Z" fill="#E8B4A0" opacity="0.6"/>
+        </svg>
+
+        <svg class="floating-shape shape-7" viewBox="0 0 175 200">
+            <path d="M87,10 C117,15 142,40 155,70 Q168,100 155,135 Q142,165 107,185 Q72,180 47,155 Q22,125 27,90 Q35,50 87,10 Z" fill="#A8C5D1" opacity="0.6"/>
+        </svg>
+
+        <svg class="floating-shape shape-8" viewBox="0 0 185 195">
+            <path d="M92,12 Q125,18 148,45 Q170,72 168,110 Q162,145 130,170 Q98,185 65,165 Q32,140 28,105 Q25,65 50,35 Q70,15 92,12 Z" fill="#9DB89A" opacity="0.6"/>
+        </svg>
+    </section>
+
+    <!-- Photo Gallery -->
+    <section id="gallery" class="page">
+        <div class="content">
+            <h2 class="section-title">Our Moments</h2>
+            <p class="hint">Tap each shape to reveal a memory</p>
+
+            <div class="gallery-grid">
+                <!-- Photo 1 -->
+                <div class="gallery-card" data-index="1">
+                    <div class="card-inner">
+                        <svg class="photo-container" viewBox="0 0 400 400">
+                            <defs>
+                                <mask id="mask-1">
+                                    <rect width="400" height="400" fill="black"/>
+                                    <path class="brush-stroke" d="M50,100 Q150,80 250,100 T350,120" stroke="white" stroke-width="80" fill="none" stroke-linecap="round"/>
+                                    <path class="brush-stroke" d="M80,200 Q180,180 280,200 T380,220" stroke="white" stroke-width="75" fill="none" stroke-linecap="round"/>
+                                    <path class="brush-stroke" d="M40,300 Q140,290 240,300 T340,310" stroke="white" stroke-width="85" fill="none" stroke-linecap="round"/>
+                                </mask>
+                            </defs>
+                            <image href="images/photo1.jpg" width="400" height="400" mask="url(#mask-1)" preserveAspectRatio="xMidYMid slice"/>
+                        </svg>
+                        <div class="shape-overlay">
+                            <svg viewBox="0 0 200 200">
+                                <path d="M100,20 Q150,40 160,90 Q150,140 100,160 Q50,140 40,90 Q50,40 100,20 Z" fill="#E8B4A0"/>
+                            </svg>
+                            <span class="tap-hint">Tap to reveal</span>
+                        </div>
+                    </div>
+                    <p class="caption">Our first adventure together</p>
+                </div>
+
+                <!-- Photo 2 -->
+                <div class="gallery-card" data-index="2">
+                    <div class="card-inner">
+                        <svg class="photo-container" viewBox="0 0 400 400">
+                            <defs>
+                                <mask id="mask-2">
+                                    <rect width="400" height="400" fill="black"/>
+                                    <path class="brush-stroke" d="M60,110 Q160,90 260,110 T360,130" stroke="white" stroke-width="78" fill="none" stroke-linecap="round"/>
+                                    <path class="brush-stroke" d="M70,210 Q170,190 270,210 T370,230" stroke="white" stroke-width="82" fill="none" stroke-linecap="round"/>
+                                    <path class="brush-stroke" d="M50,310 Q150,300 250,310 T350,320" stroke="white" stroke-width="80" fill="none" stroke-linecap="round"/>
+                                </mask>
+                            </defs>
+                            <image href="images/photo2.jpg" width="400" height="400" mask="url(#mask-2)" preserveAspectRatio="xMidYMid slice"/>
+                        </svg>
+                        <div class="shape-overlay">
+                            <svg viewBox="0 0 180 220">
+                                <path d="M90,10 Q140,30 150,80 Q160,130 140,170 Q100,210 60,180 Q20,140 30,90 Q40,40 90,10 Z" fill="#A8C5D1"/>
+                            </svg>
+                            <span class="tap-hint">Tap to reveal</span>
+                        </div>
+                    </div>
+                    <p class="caption">That beautiful sunset we watched</p>
+                </div>
+
+                <!-- Photo 3 -->
+                <div class="gallery-card" data-index="3">
+                    <div class="card-inner">
+                        <svg class="photo-container" viewBox="0 0 400 400">
+                            <defs>
+                                <mask id="mask-3">
+                                    <rect width="400" height="400" fill="black"/>
+                                    <path class="brush-stroke" d="M55,105 Q155,85 255,105 T355,125" stroke="white" stroke-width="83" fill="none" stroke-linecap="round"/>
+                                    <path class="brush-stroke" d="M75,205 Q175,185 275,205 T375,225" stroke="white" stroke-width="77" fill="none" stroke-linecap="round"/>
+                                    <path class="brush-stroke" d="M45,305 Q145,295 245,305 T345,315" stroke="white" stroke-width="81" fill="none" stroke-linecap="round"/>
+                                </mask>
+                            </defs>
+                            <image href="images/photo3.jpg" width="400" height="400" mask="url(#mask-3)" preserveAspectRatio="xMidYMid slice"/>
+                        </svg>
+                        <div class="shape-overlay">
+                            <svg viewBox="0 0 160 180">
+                                <path d="M80,20 C120,20 140,50 140,90 C140,130 110,160 80,160 C50,160 20,130 20,90 C20,50 40,20 80,20 Z" fill="#D4AF88"/>
+                            </svg>
+                            <span class="tap-hint">Tap to reveal</span>
+                        </div>
+                    </div>
+                    <p class="caption">When we couldn't stop laughing</p>
+                </div>
+
+                <!-- Photo 4 -->
+                <div class="gallery-card" data-index="4">
+                    <div class="card-inner">
+                        <svg class="photo-container" viewBox="0 0 400 400">
+                            <defs>
+                                <mask id="mask-4">
+                                    <rect width="400" height="400" fill="black"/>
+                                    <path class="brush-stroke" d="M65,115 Q165,95 265,115 T365,135" stroke="white" stroke-width="79" fill="none" stroke-linecap="round"/>
+                                    <path class="brush-stroke" d="M85,215 Q185,195 285,215 T385,235" stroke="white" stroke-width="84" fill="none" stroke-linecap="round"/>
+                                    <path class="brush-stroke" d="M55,315 Q155,305 255,315 T355,325" stroke="white" stroke-width="78" fill="none" stroke-linecap="round"/>
+                                </mask>
+                            </defs>
+                            <image href="images/photo4.jpg" width="400" height="400" mask="url(#mask-4)" preserveAspectRatio="xMidYMid slice"/>
+                        </svg>
+                        <div class="shape-overlay">
+                            <svg viewBox="0 0 190 200">
+                                <path d="M95,10 Q130,20 150,50 Q170,80 160,120 Q145,160 105,180 Q65,170 40,140 Q15,100 30,60 Q50,20 95,10 Z" fill="#9DB89A"/>
+                            </svg>
+                            <span class="tap-hint">Tap to reveal</span>
+                        </div>
+                    </div>
+                    <p class="caption">Your smile lights up my world</p>
+                </div>
+
+                <!-- Photo 5 -->
+                <div class="gallery-card" data-index="5">
+                    <div class="card-inner">
+                        <svg class="photo-container" viewBox="0 0 400 400">
+                            <defs>
+                                <mask id="mask-5">
+                                    <rect width="400" height="400" fill="black"/>
+                                    <path class="brush-stroke" d="M70,120 Q170,100 270,120 T370,140" stroke="white" stroke-width="81" fill="none" stroke-linecap="round"/>
+                                    <path class="brush-stroke" d="M90,220 Q190,200 290,220 T390,240" stroke="white" stroke-width="76" fill="none" stroke-linecap="round"/>
+                                    <path class="brush-stroke" d="M60,320 Q160,310 260,320 T360,330" stroke="white" stroke-width="82" fill="none" stroke-linecap="round"/>
+                                </mask>
+                            </defs>
+                            <image href="images/photo5.jpg" width="400" height="400" mask="url(#mask-5)" preserveAspectRatio="xMidYMid slice"/>
+                        </svg>
+                        <div class="shape-overlay">
+                            <svg viewBox="0 0 170 190">
+                                <path d="M85,15 C115,15 145,35 155,65 Q165,95 150,125 Q135,155 100,175 Q65,165 45,135 Q25,105 35,75 Q45,35 85,15 Z" fill="#C9B3D4"/>
+                            </svg>
+                            <span class="tap-hint">Tap to reveal</span>
+                        </div>
+                    </div>
+                    <p class="caption">A cozy day we'll never forget</p>
+                </div>
+
+                <!-- Photo 6 -->
+                <div class="gallery-card" data-index="6">
+                    <div class="card-inner">
+                        <svg class="photo-container" viewBox="0 0 400 400">
+                            <defs>
+                                <mask id="mask-6">
+                                    <rect width="400" height="400" fill="black"/>
+                                    <path class="brush-stroke" d="M75,125 Q175,105 275,125 T375,145" stroke="white" stroke-width="80" fill="none" stroke-linecap="round"/>
+                                    <path class="brush-stroke" d="M95,225 Q195,205 295,225 T395,245" stroke="white" stroke-width="79" fill="none" stroke-linecap="round"/>
+                                    <path class="brush-stroke" d="M65,325 Q165,315 265,325 T365,335" stroke="white" stroke-width="83" fill="none" stroke-linecap="round"/>
+                                </mask>
+                            </defs>
+                            <image href="images/photo6.jpg" width="400" height="400" mask="url(#mask-6)" preserveAspectRatio="xMidYMid slice"/>
+                        </svg>
+                        <div class="shape-overlay">
+                            <svg viewBox="0 0 200 180">
+                                <path d="M100,15 Q140,25 165,55 Q185,85 175,120 Q160,150 120,165 Q80,160 50,135 Q20,105 25,70 Q35,35 100,15 Z" fill="#E8B4A0"/>
+                            </svg>
+                            <span class="tap-hint">Tap to reveal</span>
+                        </div>
+                    </div>
+                    <p class="caption">Making memories, one moment at a time</p>
+                </div>
+            </div>
+
+            <button id="continue-btn" class="blob-button">Continue</button>
+        </div>
+    </section>
+
+    <!-- Closing Page -->
+    <section id="closing" class="page">
+        <div class="content">
+            <div class="closing-card">
+                <svg class="decorative-border shape-border-1" viewBox="0 0 150 150">
+                    <path d="M75,10 Q110,20 125,50 Q135,80 120,110 Q90,140 60,120 Q30,90 35,60 Q45,25 75,10 Z" fill="#E8B4A0" opacity="0.7"/>
+                </svg>
+                <svg class="decorative-border shape-border-2" viewBox="0 0 140 160">
+                    <path d="M70,15 C95,15 115,35 120,60 Q125,85 110,110 Q95,135 65,145 Q35,135 20,110 Q5,80 15,55 Q30,25 70,15 Z" fill="#A8C5D1" opacity="0.7"/>
+                </svg>
+                <svg class="decorative-border shape-border-3" viewBox="0 0 130 140">
+                    <path d="M65,10 Q90,15 105,35 Q120,55 115,80 Q105,105 80,125 Q55,120 35,100 Q15,75 20,50 Q30,20 65,10 Z" fill="#9DB89A" opacity="0.7"/>
+                </svg>
+                <svg class="decorative-border shape-border-4" viewBox="0 0 135 145">
+                    <path d="M67,12 C92,12 110,30 118,55 Q125,80 112,105 Q97,128 70,135 Q43,128 28,105 Q13,78 20,53 Q32,22 67,12 Z" fill="#C9B3D4" opacity="0.7"/>
+                </svg>
+
+                <h2 class="closing-title">Happy Valentine's Day</h2>
+                <p class="closing-message">
+                    Leah, every moment with you is a treasure. You bring color, joy, and beauty to my life in ways I never imagined. Thank you for being you, for your laughter, your kindness, and your love. Here's to many more adventures, quiet moments, and memories together.
+                </p>
+                <p class="closing-signature">All my love,<br>Always</p>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
