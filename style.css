@@ -31,7 +31,8 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100vh;
+    height: 100vh;              /* fallback */
+    height: 100dvh;             /* modern mobile browsers */
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -39,6 +40,7 @@ body {
     pointer-events: none;
     transition: opacity 0.8s ease;
     padding: 20px;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
     overflow-y: auto;
 }
 
