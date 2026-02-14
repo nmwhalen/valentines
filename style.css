@@ -39,6 +39,7 @@ body {
     pointer-events: none;
     transition: opacity 0.8s ease;
     padding: 20px;
+    overflow-y: auto;
 }
 
 .page.active {
