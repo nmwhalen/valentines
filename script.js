@@ -107,11 +107,16 @@ function generateSprinkles(container) {
     // Clear existing sprinkles
     container.innerHTML = '';
 
-    // Calculate sprinkle count based on area (density ~14,000 px^2/sprinkle)
+    // Calculate sprinkle count based on area
+    // Landing page uses lower density to keep focus on title and floating shapes
     const area = containerWidth * containerHeight;
-    const density = 14000;
+    const isLandingPage = page.id === 'landing';
+    const density = isLandingPage ? 35000 : 14000;
+    const minSprinkles = isLandingPage ? 20 : 50;
+    const maxSprinkles = isLandingPage ? 150 : 400;
+
     let sprinkleCount = Math.round(area / density);
-    sprinkleCount = Math.max(50, Math.min(400, sprinkleCount));
+    sprinkleCount = Math.max(minSprinkles, Math.min(maxSprinkles, sprinkleCount));
 
     // Color palette cycling
     const colors = ['var(--coral)', 'var(--pale-blue)', 'var(--sage-green)', 'var(--lavender)', 'var(--muted-gold)'];
