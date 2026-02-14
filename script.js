@@ -398,7 +398,10 @@ function attachPointerHandlers(body) {
 
 function spawnHoverParticles(body) {
     const landing = document.getElementById('landing');
-    const colors = ['var(--coral)', 'var(--pale-blue)', 'var(--sage-green)', 'var(--lavender)', 'var(--muted-gold)'];
+
+    // Get the color from the parent shape's path element
+    const pathElement = body.element.querySelector('path');
+    const shapeColor = pathElement ? pathElement.getAttribute('fill') : '#E8B4A0';
 
     // Spawn 10-14 particles
     const particleCount = 10 + Math.floor(Math.random() * 5);
@@ -407,9 +410,8 @@ function spawnHoverParticles(body) {
         const particle = document.createElement('div');
         particle.className = 'hover-particle';
 
-        // Random color from palette
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        particle.style.backgroundColor = color;
+        // Use the parent shape's color
+        particle.style.backgroundColor = shapeColor;
 
         // Random position along the border/perimeter of the shape
         const angle = Math.random() * Math.PI * 2; // Random angle in radians
