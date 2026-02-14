@@ -69,12 +69,12 @@ body {
 .title-text {
     font-family: 'Playfair Display', serif;
     font-weight: 700;
-    font-size: 72px;
+    font-size: 66px;
     fill: var(--text-dark);
 }
 
 .title-text.line-2 {
-    font-size: 90px;
+    font-size: 82px;
 }
 
 /* Title brush stroke animation */
@@ -471,11 +471,11 @@ body {
     .shape-border-4 { bottom: -15px; right: -15px; }
 
     .title-text {
-        font-size: 42px;
+        font-size: 52px;
     }
 
     .title-text.line-2 {
-        font-size: 56px;
+        font-size: 70px;
     }
 }
 
@@ -489,10 +489,10 @@ body {
     }
 
     .title-text {
-        font-size: 32px;
+        font-size: 56px;
     }
 
     .title-text.line-2 {
-        font-size: 44px;
+        font-size: 72px;
     }
 }
