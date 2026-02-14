@@ -206,7 +206,7 @@ function initShapePhysics() {
         // Calculate center position relative to landing page
         const width = rect.width;
         const height = rect.height;
-        const radius = width / 2;
+        const radius = (width / 2) * 0.75; // Reduce collision radius to better match visual shape
 
         // Get current position relative to landing page
         const x = rect.left - landingRect.left + radius;
