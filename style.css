@@ -33,7 +33,7 @@ body {
     width: 100%;
     height: 100vh;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     opacity: 0;
     pointer-events: none;
@@ -53,6 +53,13 @@ body {
     max-width: 1200px;
     width: 100%;
     text-align: center;
+}
+
+/* Center content for pages without overflow */
+#landing .content,
+#closing .content {
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 /* ===== Typography ===== */
