@@ -178,6 +178,8 @@ const HOVER_ANGULAR_VELOCITY = 12;    // degrees per frame (randomized +/-)
 const HOVER_PARTICLE_COUNT = 12;       // particles per hover burst
 const HOVER_PARTICLE_DURATION = 800;   // ms, matches CSS animation
 const HOVER_COOLDOWN = 2500;           // ms, minimum time between hover effects
+const COLLISION_SPEED_THRESHOLD = 2;   // minimum collision speed to trigger particles
+const COLLISION_COOLDOWN = 800;        // ms, minimum time between collision effects
 
 const physicsState = {
     bodies: [],
@@ -239,7 +241,8 @@ function initShapePhysics() {
             rotation: 0,
             angularVelocity: 0,
             isHovered: false,
-            lastHoverTime: 0
+            lastHoverTime: 0,
+            lastCollisionTime: 0
         };
 
         physicsState.bodies.push(body);
@@ -441,6 +444,62 @@ function spawnHoverParticles(body) {
     }
 }
 
+function spawnCollisionParticles(bodyA, bodyB, collisionX, collisionY) {
+    const landing = document.getElementById('landing');
+    const now = performance.now();
+
+    // Check cooldown for both bodies
+    if (now - bodyA.lastCollisionTime < COLLISION_COOLDOWN) return;
+    if (now - bodyB.lastCollisionTime < COLLISION_COOLDOWN) return;
+
+    // Update collision times
+    bodyA.lastCollisionTime = now;
+    bodyB.lastCollisionTime = now;
+
+    // Get colors from both shapes
+    const pathA = bodyA.element.querySelector('path');
+    const pathB = bodyB.element.querySelector('path');
+    const colorA = pathA ? pathA.getAttribute('fill') : '#E8B4A0';
+    const colorB = pathB ? pathB.getAttribute('fill') : '#E8B4A0';
+
+    // Spawn 6-10 particles total (mix of both colors)
+    const particleCount = 6 + Math.floor(Math.random() * 5);
+
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'hover-particle';
+
+        // Alternate between both colors
+        const color = i % 2 === 0 ? colorA : colorB;
+        particle.style.backgroundColor = color;
+
+        // Start at collision point with small random spread
+        const spreadAngle = Math.random() * Math.PI * 2;
+        const spreadDist = Math.random() * 15;
+        const startX = collisionX + Math.cos(spreadAngle) * spreadDist;
+        const startY = collisionY + Math.sin(spreadAngle) * spreadDist;
+
+        // Particles burst outward in all directions
+        const burstAngle = Math.random() * Math.PI * 2;
+        const burstDist = 30 + Math.random() * 40;
+        const endX = startX + Math.cos(burstAngle) * burstDist;
+        const endY = startY + Math.sin(burstAngle) * burstDist;
+
+        // Set CSS custom properties for animation
+        particle.style.setProperty('--px', `${startX}px`);
+        particle.style.setProperty('--py', `${startY}px`);
+        particle.style.setProperty('--px-end', `${endX}px`);
+        particle.style.setProperty('--py-end', `${endY}px`);
+
+        // Remove particle after animation completes
+        particle.addEventListener('animationend', () => {
+            particle.remove();
+        });
+
+        landing.appendChild(particle);
+    }
+}
+
 function startPhysicsLoop() {
     let lastTime = performance.now();
 
@@ -569,6 +628,9 @@ function resolveCollisions() {
 
                 // Only resolve if bodies are moving toward each other
                 if (dotProduct < 0) {
+                    // Calculate collision speed (relative velocity magnitude)
+                    const collisionSpeed = Math.sqrt(dvx * dvx + dvy * dvy);
+
                     // Elastic collision impulse
                     const impulse = (2 * dotProduct) / totalMass;
 
@@ -576,6 +638,14 @@ function resolveCollisions() {
                     a.vy += impulse * b.mass * ny * RESTITUTION;
                     b.vx -= impulse * a.mass * nx * RESTITUTION;
                     b.vy -= impulse * a.mass * ny * RESTITUTION;
+
+                    // Spawn particles on high-speed collisions
+                    if (collisionSpeed > COLLISION_SPEED_THRESHOLD) {
+                        // Calculate collision point (between the two shapes)
+                        const collisionX = a.x + nx * a.radius;
+                        const collisionY = a.y + ny * a.radius;
+                        spawnCollisionParticles(a, b, collisionX, collisionY);
+                    }
                 }
             }
         }
