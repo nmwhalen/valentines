@@ -16,6 +16,11 @@ const MATISSE_PATHS = [
 const MATISSE_VIEWBOX = "0 0 612 792";
 const PALETTE_COLORS = ['#E8B4A0', '#A8C5D1', '#D4AF88', '#9DB89A', '#C9B3D4'];
 
+function randomNewColor(currentColor) {
+    const options = PALETTE_COLORS.filter(c => c !== currentColor);
+    return options[Math.floor(Math.random() * options.length)];
+}
+
 function shuffleArray(arr) {
     const shuffled = arr.slice();
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -771,6 +776,12 @@ function resolveCollisions() {
 
                     // Spawn particles on high-speed collisions
                     if (collisionSpeed > COLLISION_SPEED_THRESHOLD) {
+                        // Change colors on collision
+                        const pathA = a.element.querySelector('path');
+                        const pathB = b.element.querySelector('path');
+                        if (pathA) pathA.setAttribute('fill', randomNewColor(pathA.getAttribute('fill')));
+                        if (pathB) pathB.setAttribute('fill', randomNewColor(pathB.getAttribute('fill')));
+
                         // Calculate collision point (between the two shapes)
                         const collisionX = a.x + nx * a.radius;
                         const collisionY = a.y + ny * a.radius;
